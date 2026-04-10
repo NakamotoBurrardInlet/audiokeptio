@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@AUDIOKEPT.io | The Eyes of Purity</title>
+    <title>@AUDIOKEPT.io | The Persistent Void</title>
     <style>
         /* =========================================
            CORE STYLING & ATMOSPHERE
@@ -21,12 +21,11 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Courier New', Courier, monospace; /* Dialectics of precision */
+            font-family: 'Courier New', Courier, monospace;
         }
 
         body {
             background-color: #0a0a0a;
-            /* 1600s record player & firewood aesthetic background */
             background-image: linear-gradient(rgba(10, 5, 0, 0.7), rgba(15, 5, 0, 0.85)), 
                               url('https://images.unsplash.com/photo-1614631446501-abcf76949eca?auto=format&fit=crop&w=1920&q=80');
             background-size: cover;
@@ -47,7 +46,7 @@
             width: 100%;
             height: 100%;
             z-index: 0;
-            pointer-events: none; /* Let clicks pass through */
+            pointer-events: none;
             opacity: 0.4;
         }
 
@@ -69,6 +68,375 @@
             font-weight: normal;
         }
 
+        .main-container {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        .panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* Left: Upload Widget */
+        .upload-section { width: 300px; flex-shrink: 0; }
+        .upload-section h2 { color: var(--accent-gold); margin-bottom: 15px; font-size: 1.2rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: var(--text-muted); }
+        .form-group input[type="text"], .form-group textarea {
+            width: 100%; padding: 10px; background: rgba(0,0,0,0.5);
+            border: 1px solid var(--glass-border); color: var(--text-main);
+            border-radius: 5px; outline: none;
+        }
+        .form-group input[type="text"]:focus, .form-group textarea:focus { border-color: var(--accent-gold); }
+        
+        .file-upload-btn {
+            display: block; width: 100%; padding: 10px; text-align: center;
+            background: rgba(255, 255, 255, 0.05); border: 1px dashed var(--accent-gold);
+            cursor: pointer; transition: 0.3s; border-radius: 5px; color: var(--accent-gold);
+        }
+        .file-upload-btn:hover { background: rgba(255, 255, 255, 0.1); }
+        input[type="file"] { display: none; }
+
+        .submit-btn {
+            width: 100%; padding: 12px; background: var(--accent-gold);
+            color: #000; border: none; font-weight: bold; cursor: pointer;
+            border-radius: 5px; transition: 0.3s; margin-top: 10px; text-transform: uppercase; letter-spacing: 2px;
+        }
+        .submit-btn:hover { background: var(--accent-glow); box-shadow: 0 0 15px var(--accent-glow); }
+
+        /* Center: The Continuous Reel */
+        .reel-section { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--accent-gold) rgba(0,0,0,0.5); }
+        .reel-section::-webkit-scrollbar { width: 8px; }
+        .reel-section::-webkit-scrollbar-thumb { background-color: var(--accent-gold); border-radius: 4px; }
+
+        .track-card {
+            background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border);
+            border-radius: 10px; padding: 15px; margin-bottom: 20px;
+            display: flex; gap: 15px; position: relative; animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .track-image { width: 120px; height: 120px; border-radius: 5px; object-fit: cover; border: 1px solid var(--glass-border); background: #111; }
+        .track-info { flex: 1; display: flex; flex-direction: column; }
+        .track-number { position: absolute; top: 15px; right: 15px; font-size: 0.8rem; color: var(--text-muted); }
+        .track-title { font-size: 1.4rem; color: var(--accent-gold); margin-bottom: 5px; }
+        .track-artist { font-size: 1rem; color: var(--text-muted); margin-bottom: 10px; }
+        .track-brief { font-size: 0.9rem; line-height: 1.4; margin-bottom: 15px; flex: 1; }
+        
+        audio { width: 100%; height: 35px; outline: none; margin-bottom: 10px; }
+        audio::-webkit-media-controls-panel { background: rgba(255, 255, 255, 0.1); }
+        audio::-webkit-media-controls-play-button, audio::-webkit-media-controls-mute-button { filter: invert(1); }
+
+        .interactions { display: flex; gap: 10px; }
+        .interact-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+            color: var(--text-main); padding: 5px 12px; border-radius: 20px;
+            cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 5px;
+        }
+        .interact-btn:hover { background: rgba(255,255,255,0.15); border-color: var(--accent-gold); }
+
+        /* Right: Conversation Box */
+        .chat-section { width: 300px; flex-shrink: 0; display: flex; flex-direction: column; }
+        .chat-messages { flex: 1; overflow-y: auto; margin-bottom: 15px; padding-right: 5px; scrollbar-width: none; }
+        .chat-msg { margin-bottom: 10px; font-size: 0.9rem; line-height: 1.3; }
+        .chat-msg span.anon { color: var(--accent-gold); font-weight: bold; }
+        .chat-input-wrapper { display: flex; gap: 10px; }
+        .chat-input-wrapper input { flex: 1; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: white; border-radius: 5px; outline: none; }
+        .chat-input-wrapper button { padding: 10px 15px; background: var(--accent-gold); border: none; border-radius: 5px; cursor: pointer; color: black; font-weight: bold; }
+        
+        /* System Status Log */
+        #sys-log { text-align: center; font-size: 0.8rem; color: var(--accent-gold); margin-top: 10px; }
+
+    </style>
+</head>
+<body>
+
+    <canvas id="wavelengths"></canvas>
+
+    <header>
+        <h1>@AUDIOKEPT</h1>
+        <div id="sys-log">Initializing Void Database...</div>
+    </header>
+
+    <div class="main-container">
+        
+        <div class="panel upload-section">
+            <h2>Add to the Reel</h2>
+            <div class="form-group"><input type="text" id="up-title" placeholder="Track Title..."></div>
+            <div class="form-group"><input type="text" id="up-artist" placeholder="Artist (Anonymous)..."></div>
+            <div class="form-group"><textarea id="up-brief" rows="3" placeholder="Briefing / Attributes..."></textarea></div>
+            
+            <div class="form-group">
+                <label class="file-upload-btn" for="up-audio" id="audio-label">+ Upload Audio File</label>
+                <input type="file" id="up-audio" accept="audio/*">
+            </div>
+
+            <div class="form-group">
+                <label class="file-upload-btn" for="up-image" id="image-label">+ Upload Artwork</label>
+                <input type="file" id="up-image" accept="image/*">
+            </div>
+
+            <button class="submit-btn" onclick="uploadTrack()">Pressurize Void</button>
+        </div>
+
+        <div class="panel reel-section" id="reel-container"></div>
+
+        <div class="panel chat-section">
+            <h2 style="color: var(--accent-gold); font-size: 1.1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-bottom: 15px;">Live Dialogue</h2>
+            <div class="chat-messages" id="chat-box"></div>
+            <div class="chat-input-wrapper">
+                <input type="text" id="chat-input" placeholder="Conversate..." onkeypress="handleChatEnter(event)">
+                <button onclick="postChat()">></button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /* =========================================
+           CANVAS BACKGROUND
+        ========================================= */
+        const canvas = document.getElementById('wavelengths');
+        const ctx = canvas.getContext('2d');
+        let width, height; let time = 0;
+
+        function resizeCanvas() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+        function drawWavelengths() {
+            ctx.clearRect(0, 0, width, height); ctx.lineWidth = 1.5;
+            const waves = [
+                { amp: 80, freq: 0.003, speed: 0.02, color: 'rgba(230, 185, 92, 0.4)' },
+                { amp: 120, freq: 0.002, speed: -0.015, color: 'rgba(255, 140, 0, 0.2)' },
+                { amp: 50, freq: 0.005, speed: 0.03, color: 'rgba(200, 200, 255, 0.1)' }
+            ];
+            waves.forEach(wave => {
+                ctx.beginPath(); ctx.strokeStyle = wave.color;
+                for (let x = 0; x < width; x += 5) {
+                    let y = height / 2 + Math.sin(x * wave.freq + time * wave.speed) * wave.amp + Math.cos(x * wave.freq * 0.5 - time * wave.speed) * (wave.amp / 2);
+                    if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            });
+            time += 1; requestAnimationFrame(drawWavelengths);
+        }
+        drawWavelengths();
+
+        /* =========================================
+           INDEXED-DB BACKEND SYSTEM
+           Locally stores blobs and objects permanently
+        ========================================= */
+        let db;
+        const sysLog = document.getElementById('sys-log');
+        const DB_NAME = "AudioKeptDatabase";
+        const DB_VERSION = 1;
+
+        // Initialize Database
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+        request.onupgradeneeded = function(event) {
+            db = event.target.result;
+            // Create table for Tracks
+            if(!db.objectStoreNames.contains('tracks')) {
+                db.createObjectStore('tracks', { keyPath: 'id', autoIncrement: true });
+            }
+            // Create table for Chats
+            if(!db.objectStoreNames.contains('chats')) {
+                db.createObjectStore('chats', { keyPath: 'id', autoIncrement: true });
+            }
+            sysLog.innerText = "Database Structure Built.";
+        };
+
+        request.onsuccess = function(event) {
+            db = event.target.result;
+            sysLog.innerText = "Database Connected: Purity Achieved.";
+            loadTracksFromDB();
+            loadChatsFromDB();
+        };
+
+        request.onerror = function(event) {
+            sysLog.innerText = "Database Connection Failed.";
+            console.error("IndexedDB Error:", event.target.errorCode);
+        };
+
+        /* =========================================
+           TRACK HANDLING (UPLOAD & LOAD)
+        ========================================= */
+        document.getElementById('up-audio').addEventListener('change', e => {
+            document.getElementById('audio-label').innerText = e.target.files[0] ? e.target.files[0].name : "+ Upload Audio File";
+        });
+        document.getElementById('up-image').addEventListener('change', e => {
+            document.getElementById('image-label').innerText = e.target.files[0] ? e.target.files[0].name : "+ Upload Artwork";
+        });
+
+        function uploadTrack() {
+            const title = document.getElementById('up-title').value || 'Untitled Frequency';
+            const artist = document.getElementById('up-artist').value || 'Anonymous';
+            const brief = document.getElementById('up-brief').value || 'No attributes provided.';
+            const audioFile = document.getElementById('up-audio').files[0];
+            const imageFile = document.getElementById('up-image').files[0];
+
+            if (!audioFile) { alert("The void requires an audio file to pressurize."); return; }
+
+            const newTrack = {
+                title: title,
+                artist: artist,
+                brief: brief,
+                audioBlob: audioFile,
+                imageBlob: imageFile || null,
+                likes: 0,
+                smiles: 0,
+                timestamp: new Date().getTime()
+            };
+
+            const transaction = db.transaction(["tracks"], "readwrite");
+            const store = transaction.objectStore("tracks");
+            const addRequest = store.add(newTrack);
+
+            addRequest.onsuccess = function() {
+                // Reset form
+                document.getElementById('up-title').value = '';
+                document.getElementById('up-artist').value = '';
+                document.getElementById('up-brief').value = '';
+                document.getElementById('up-audio').value = '';
+                document.getElementById('up-image').value = '';
+                document.getElementById('audio-label').innerText = '+ Upload Audio File';
+                document.getElementById('image-label').innerText = '+ Upload Artwork';
+                
+                // Reload feed to show new track
+                loadTracksFromDB();
+            };
+        }
+
+        function loadTracksFromDB() {
+            const reelContainer = document.getElementById('reel-container');
+            reelContainer.innerHTML = ''; // Clear current
+
+            const transaction = db.transaction(["tracks"], "readonly");
+            const store = transaction.objectStore("tracks");
+            const request = store.getAll();
+
+            request.onsuccess = function() {
+                const tracks = request.result;
+                // Sort by timestamp descending (newest at top)
+                tracks.sort((a, b) => b.timestamp - a.timestamp);
+
+                tracks.forEach((track, index) => {
+                    // Total minus index to get the continuous count up properly based on array position
+                    const trackNumber = tracks.length - index; 
+
+                    // Create URLs from the saved DB Blobs
+                    const audioUrl = URL.createObjectURL(track.audioBlob);
+                    const imageUrl = track.imageBlob ? URL.createObjectURL(track.imageBlob) : 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&w=200&q=80';
+
+                    const card = document.createElement('div');
+                    card.className = 'track-card';
+                    
+                    card.innerHTML = `
+                        <span class="track-number">#${trackNumber.toString().padStart(4, '0')}</span>
+                        <img src="${imageUrl}" class="track-image" alt="Artwork">
+                        <div class="track-info">
+                            <div class="track-title">${track.title}</div>
+                            <div class="track-artist">by ${track.artist}</div>
+                            <div class="track-brief">${track.brief}</div>
+                            <audio controls>
+                                <source src="${audioUrl}" type="${track.audioBlob.type}">
+                            </audio>
+                            <div class="interactions">
+                                <button class="interact-btn" onclick="updateInteraction(${track.id}, 'likes')">
+                                    👍 <span id="like-${track.id}">${track.likes}</span>
+                                </button>
+                                <button class="interact-btn" onclick="updateInteraction(${track.id}, 'smiles')">
+                                    😊 <span id="smile-${track.id}">${track.smiles}</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    reelContainer.appendChild(card);
+                });
+            };
+        }
+
+        function updateInteraction(id, type) {
+            const transaction = db.transaction(["tracks"], "readwrite");
+            const store = transaction.objectStore("tracks");
+            const request = store.get(id);
+
+            request.onsuccess = function() {
+                const track = request.result;
+                if(type === 'likes') track.likes += 1;
+                if(type === 'smiles') track.smiles += 1;
+                
+                const updateRequest = store.put(track);
+                updateRequest.onsuccess = function() {
+                    // Update DOM directly for speed
+                    if(type === 'likes') document.getElementById(`like-${id}`).innerText = track.likes;
+                    if(type === 'smiles') document.getElementById(`smile-${id}`).innerText = track.smiles;
+                };
+            };
+        }
+
+        /* =========================================
+           CONVERSATION DB LOGIC
+        ========================================= */
+        // Generate anon ID once per session to maintain identity during a visit
+        const anonId = Math.floor(Math.random() * 999).toString().padStart(3, '0');
+
+        function postChat() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const newMsg = {
+                username: `Anon_${anonId}`,
+                text: text,
+                timestamp: new Date().getTime()
+            };
+
+            const transaction = db.transaction(["chats"], "readwrite");
+            const store = transaction.objectStore("chats");
+            store.add(newMsg).onsuccess = function() {
+                input.value = '';
+                loadChatsFromDB();
+            };
+        }
+
+        function loadChatsFromDB() {
+            const chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML = '<div class="chat-msg"><span class="anon">System:</span> The persistent void is open.</div>';
+
+            const transaction = db.transaction(["chats"], "readonly");
+            const store = transaction.objectStore("chats");
+            const request = store.getAll();
+
+            request.onsuccess = function() {
+                const messages = request.result;
+                messages.sort((a, b) => a.timestamp - b.timestamp); // Oldest to newest
+
+                messages.forEach(msg => {
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = 'chat-msg';
+                    msgDiv.innerHTML = `<span class="anon">${msg.username}:</span> ${msg.text}`;
+                    chatBox.appendChild(msgDiv);
+                });
+                
+                chatBox.scrollTop = chatBox.scrollHeight;
+            };
+        }
+
+        
         .main-container {
             display: flex;
             flex: 1;
