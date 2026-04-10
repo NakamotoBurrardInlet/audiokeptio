@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@AUDIOKEPT.io | The Eyes of Purity</title>
+    <style>
+        /* =========================================
+           CORE STYLING & ATMOSPHERE
+        ========================================= */
+        :root {
+            --glass-bg: rgba(20, 15, 10, 0.65);
+            --glass-border: rgba(255, 200, 100, 0.15);
+            --accent-gold: #e6b95c;
+            --accent-glow: #ff8c00;
+            --text-main: #f0e6d2;
+            --text-muted: #a89f91;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace; /* Dialectics of precision */
+        }
+
+        body {
+            background-color: #0a0a0a;
+            /* 1600s record player & firewood aesthetic background */
+            background-image: linear-gradient(rgba(10, 5, 0, 0.7), rgba(15, 5, 0, 0.85)), 
+                              url('https://images.unsplash.com/photo-1614631446501-abcf76949eca?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Abstract Wavelength Canvas */
+        #wavelengths {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none; /* Let clicks pass through */
+            opacity: 0.4;
+        }
+
+        /* =========================================
+           LAYOUT & WIDGETS
+        ========================================= */
+        header {
+            text-align: center;
+            padding: 20px;
+            z-index: 10;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            letter-spacing: 5px;
+            color: var(--accent-gold);
+            text-shadow: 0 0 15px var(--accent-glow);
+            font-weight: normal;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        /* Glassmorphism Panels */
+        .panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* Left: Upload Widget */
+        .upload-section {
+            width: 300px;
+            flex-shrink: 0;
+        }
+
+        .upload-section h2 {
+            color: var(--accent-gold);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 10px;
+        }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: var(--text-muted); }
+        .form-group input[type="text"], .form-group textarea {
+            width: 100%; padding: 10px; background: rgba(0,0,0,0.5);
+            border: 1px solid var(--glass-border); color: var(--text-main);
+            border-radius: 5px; outline: none;
+        }
+        .form-group input[type="text"]:focus, .form-group textarea:focus {
+            border-color: var(--accent-gold);
+        }
+        
+        .file-upload-btn {
+            display: block; width: 100%; padding: 10px; text-align: center;
+            background: rgba(255, 255, 255, 0.05); border: 1px dashed var(--accent-gold);
+            cursor: pointer; transition: 0.3s; border-radius: 5px; color: var(--accent-gold);
+        }
+        .file-upload-btn:hover { background: rgba(255, 255, 255, 0.1); }
+        input[type="file"] { display: none; }
+
+        .submit-btn {
+            width: 100%; padding: 12px; background: var(--accent-gold);
+            color: #000; border: none; font-weight: bold; cursor: pointer;
+            border-radius: 5px; transition: 0.3s; margin-top: 10px;
+            text-transform: uppercase; letter-spacing: 2px;
+        }
+        .submit-btn:hover { background: var(--accent-glow); box-shadow: 0 0 15px var(--accent-glow); }
+
+        /* Center: The Continuous Reel */
+        .reel-section {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-gold) rgba(0,0,0,0.5);
+        }
+        .reel-section::-webkit-scrollbar { width: 8px; }
+        .reel-section::-webkit-scrollbar-thumb { background-color: var(--accent-gold); border-radius: 4px; }
+
+        .track-card {
+            background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border);
+            border-radius: 10px; padding: 15px; margin-bottom: 20px;
+            display: flex; gap: 15px; position: relative;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .track-image {
+            width: 120px; height: 120px; border-radius: 5px; object-fit: cover;
+            border: 1px solid var(--glass-border); background: #111;
+        }
+
+        .track-info { flex: 1; display: flex; flex-direction: column; }
+        .track-number { position: absolute; top: 15px; right: 15px; font-size: 0.8rem; color: var(--text-muted); }
+        .track-title { font-size: 1.4rem; color: var(--accent-gold); margin-bottom: 5px; }
+        .track-artist { font-size: 1rem; color: var(--text-muted); margin-bottom: 10px; }
+        .track-brief { font-size: 0.9rem; line-height: 1.4; margin-bottom: 15px; flex: 1; }
+        
+        audio { width: 100%; height: 35px; outline: none; margin-bottom: 10px; }
+        audio::-webkit-media-controls-panel { background: rgba(255, 255, 255, 0.1); }
+        audio::-webkit-media-controls-play-button, audio::-webkit-media-controls-mute-button { filter: invert(1); }
+
+        .interactions { display: flex; gap: 10px; }
+        .interact-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+            color: var(--text-main); padding: 5px 12px; border-radius: 20px;
+            cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 5px;
+        }
+        .interact-btn:hover { background: rgba(255,255,255,0.15); border-color: var(--accent-gold); }
+
+        /* Right: Conversation Box */
+        .chat-section {
+            width: 300px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1; overflow-y: auto; margin-bottom: 15px;
+            padding-right: 5px; scrollbar-width: none;
+        }
+        
+        .chat-msg { margin-bottom: 10px; font-size: 0.9rem; line-height: 1.3; }
+        .chat-msg span.anon { color: var(--accent-gold); font-weight: bold; }
+        
+        .chat-input-wrapper { display: flex; gap: 10px; }
+        .chat-input-wrapper input {
+            flex: 1; padding: 10px; background: rgba(0,0,0,0.5);
+            border: 1px solid var(--glass-border); color: white;
+            border-radius: 5px; outline: none;
+        }
+        .chat-input-wrapper button {
+            padding: 10px 15px; background: var(--accent-gold); border: none;
+            border-radius: 5px; cursor: pointer; color: black; font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+
+    <canvas id="wavelengths"></canvas>
+
+    <header>
+        <h1>@AUDIOKEPT</h1>
+    </header>
+
+    <div class="main-container">
+        
+        <div class="panel upload-section">
+            <h2>Add to the Reel</h2>
+            <div class="form-group">
+                <input type="text" id="up-title" placeholder="Track Title...">
+            </div>
+            <div class="form-group">
+                <input type="text" id="up-artist" placeholder="Artist (Anonymous)...">
+            </div>
+            <div class="form-group">
+                <textarea id="up-brief" rows="3" placeholder="Briefing / Attributes..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="file-upload-btn" for="up-audio" id="audio-label">
+                    + Upload Audio File
+                </label>
+                <input type="file" id="up-audio" accept="audio/mp3, audio/wav, audio/ogg, audio/flac, audio/aac, audio/m4a, audio/wma, audio/amr, audio/aiff, audio/webm">
+            </div>
+
+            <div class="form-group">
+                <label class="file-upload-btn" for="up-image" id="image-label">
+                    + Upload Artwork
+                </label>
+                <input type="file" id="up-image" accept="image/*">
+            </div>
+
+            <button class="submit-btn" onclick="uploadTrack()">Pressurize Void</button>
+        </div>
+
+        <div class="panel reel-section" id="reel-container">
+            </div>
+
+        <div class="panel chat-section">
+            <h2 style="color: var(--accent-gold); font-size: 1.1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-bottom: 15px;">Live Dialogue</h2>
+            <div class="chat-messages" id="chat-box">
+                <div class="chat-msg"><span class="anon">Anon_001:</span> The void is open. True is true.</div>
+            </div>
+            <div class="chat-input-wrapper">
+                <input type="text" id="chat-input" placeholder="Conversate..." onkeypress="handleChatEnter(event)">
+                <button onclick="postChat()">></button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /* =========================================
+           ABSTRACT WAVELENGTH ALGORITHM (CANVAS)
+           "True is true false false is true as a true vector"
+        ========================================= */
+        const canvas = document.getElementById('wavelengths');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let time = 0;
+
+        function resizeCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function drawWavelengths() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.lineWidth = 1.5;
+            
+            // 3 Intersecting waves simulating dialectics of precision
+            const waves = [
+                { amp: 80, freq: 0.003, speed: 0.02, color: 'rgba(230, 185, 92, 0.4)' },
+                { amp: 120, freq: 0.002, speed: -0.015, color: 'rgba(255, 140, 0, 0.2)' },
+                { amp: 50, freq: 0.005, speed: 0.03, color: 'rgba(200, 200, 255, 0.1)' }
+            ];
+
+            waves.forEach(wave => {
+                ctx.beginPath();
+                ctx.strokeStyle = wave.color;
+                for (let x = 0; x < width; x += 5) {
+                    // Complex sine modulation
+                    let y = height / 2 + 
+                            Math.sin(x * wave.freq + time * wave.speed) * wave.amp + 
+                            Math.cos(x * wave.freq * 0.5 - time * wave.speed) * (wave.amp / 2);
+                    
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            });
+
+            time += 1;
+            requestAnimationFrame(drawWavelengths);
+        }
+        drawWavelengths();
+
+        /* =========================================
+           "BACKEND" DATABASE SIMULATION & LOGIC
+        ========================================= */
+        let trackCount = 0;
+        const reelContainer = document.getElementById('reel-container');
+        
+        // File input label updaters
+        document.getElementById('up-audio').addEventListener('change', function(e) {
+            let fileName = e.target.files[0] ? e.target.files[0].name : "+ Upload Audio File";
+            document.getElementById('audio-label').innerText = fileName;
+        });
+        document.getElementById('up-image').addEventListener('change', function(e) {
+            let fileName = e.target.files[0] ? e.target.files[0].name : "+ Upload Artwork";
+            document.getElementById('image-label').innerText = fileName;
+        });
+
+        function uploadTrack() {
+            const title = document.getElementById('up-title').value || 'Untitled Frequency';
+            const artist = document.getElementById('up-artist').value || 'Anonymous';
+            const brief = document.getElementById('up-brief').value || 'No attributes provided.';
+            
+            const audioFile = document.getElementById('up-audio').files[0];
+            const imageFile = document.getElementById('up-image').files[0];
+
+            if (!audioFile) {
+                alert("The void requires an audio file to pressurize.");
+                return;
+            }
+
+            // Create local object URLs for immediate browser playback/rendering
+            const audioUrl = URL.createObjectURL(audioFile);
+            const imageUrl = imageFile ? URL.createObjectURL(imageFile) : 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&w=200&q=80';
+
+            trackCount++;
+            
+            // Build the card HTML
+            const card = document.createElement('div');
+            card.className = 'track-card';
+            // Generate unique IDs for interactions
+            const likeId = `like-${trackCount}`;
+            const smileId = `smile-${trackCount}`;
+
+            card.innerHTML = `
+                <span class="track-number">#${trackCount.toString().padStart(4, '0')}</span>
+                <img src="${imageUrl}" class="track-image" alt="Artwork">
+                <div class="track-info">
+                    <div class="track-title">${title}</div>
+                    <div class="track-artist">by ${artist}</div>
+                    <div class="track-brief">${brief}</div>
+                    
+                    <audio controls>
+                        <source src="${audioUrl}" type="${audioFile.type}">
+                        Your browser does not support the audio element.
+                    </audio>
+                    
+                    <div class="interactions">
+                        <button class="interact-btn" onclick="incrementInteraction('${likeId}')">
+                            👍 <span id="${likeId}">0</span>
+                        </button>
+                        <button class="interact-btn" onclick="incrementInteraction('${smileId}')">
+                            😊 <span id="${smileId}">0</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // Prepend to show newest at top (stretching out continuous count)
+            reelContainer.prepend(card);
+
+            // Reset form
+            document.getElementById('up-title').value = '';
+            document.getElementById('up-artist').value = '';
+            document.getElementById('up-brief').value = '';
+            document.getElementById('up-audio').value = '';
+            document.getElementById('up-image').value = '';
+            document.getElementById('audio-label').innerText = '+ Upload Audio File';
+            document.getElementById('image-label').innerText = '+ Upload Artwork';
+        }
+
+        function incrementInteraction(elementId) {
+            const el = document.getElementById(elementId);
+            let count = parseInt(el.innerText);
+            el.innerText = count + 1;
+        }
+
+        /* =========================================
+           CONVERSATION BOX LOGIC
+        ========================================= */
+        function postChat() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const chatBox = document.getElementById('chat-box');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'chat-msg';
+            
+            // Generate random anon ID for dialectic realistic effort
+            const randomAnon = Math.floor(Math.random() * 999).toString().padStart(3, '0');
+            
+            msgDiv.innerHTML = `<span class="anon">Anon_${randomAnon}:</span> ${text}`;
+            chatBox.appendChild(msgDiv);
+            
+            // Auto scroll to bottom
+            chatBox.scrollTop = chatBox.scrollHeight;
+            input.value = '';
+        }
+
+        function handleChatEnter(e) {
+            if (e.key === 'Enter') {
+                postChat();
+            }
+        }
+    </script>
+</body>
+</html>
+
+
